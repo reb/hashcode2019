@@ -18,32 +18,39 @@ def solve(problem):
         if photo['orientation'] == 'H':
             slides.append({
                 'photos': [photo['index']],
-                'tags': sorted(photo['tags'])
+                'tags': set(photo['tags'])
             })
         else:
             verticals.append(photo)
     for photo_a, photo_b in pairwise(verticals):
         slides.append({
             'photos': [photo_a['index'], photo_b['index']],
-            'tags': sorted(photo_a['tags'] + photo_b['tags'])
+            'tags': set(photo_a['tags'] + photo_b['tags'])
         })
 
-    tags = defaultdict(list)
+    tags = defaultdict(set)
 
-    for slide in slides:
+    for index, slide in enumerate(slides):
+        slide['index'] = index
         for tag in slide['tags']:
-            tags[tag].append(slide)
+            tags[tag].add(index)
+
+    available_slides = [slide['index'] for slide in slides]
 
     first_slide = slides.pop()
     tags = remove_from_tags(first_slide, tags)
+    available_slides.remove(first_slide['index'])
     slideshow = [first_slide]
+    logger.debug(first_slide)
 
-    while slides:
-        logger.debug('slideshow length: %s', len(slideshow))
+    while available_slides:
+        logger.info('slideshow length: %s', len(slideshow))
         current_slide = slideshow[-1]
-        next_slide = find_next_slide(current_slide, tags)
-        if next_slide:
-            slides.remove(next_slide)
+        next_slide_index = find_next_slide(current_slide, tags)
+        if next_slide_index is not None:
+            available_slides.remove(next_slide_index)
+            next_slide = slides[next_slide_index]
+            logger.debug(next_slide)
             tags = remove_from_tags(next_slide, tags)
             slideshow.append(next_slide)
             continue
@@ -54,10 +61,11 @@ def solve(problem):
 def find_next_slide(slide, tags):
     for tag in slide['tags']:
         if tags[tag]:
-            return tags[tag][0]
-    return False
+            logger.debug('matching on %s', tag)
+            return next(iter(tags[tag]))
+    return None
 
 def remove_from_tags(slide, tags):
     for tag in slide['tags']:
-        tags[tag].remove(slide)
+        tags[tag].remove(slide['index'])
     return tags
