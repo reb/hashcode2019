@@ -20,6 +20,7 @@ def export(name, solution):
         lines = [str(len(solution))]
         lines += [' '.join([str(photo) for photo in photos]) for photos in solution]
 
+        lines = [line + '\n' for line in lines]
         output_file.writelines(lines)
 
 
