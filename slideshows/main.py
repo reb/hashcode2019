@@ -10,15 +10,17 @@ def solve(problem):
     return problem
 
 
-def export(name, data):
+def export(name, solution):
     timestamp = datetime.now().strftime("%Y%m%d-%H%M")
     filename = timestamp + '_' + name + '.txt'
 
     with open('output/' + filename, 'w') as output_file:
         logger.info('Writing result to: %s', output_file.name)
 
-        for line in data:
-            output_file.write(line)
+        lines = [str(len(solution))]
+        lines += [' '.join([str(photo) for photo in photos]) for photos in solution]
+
+        output_file.writelines(lines)
 
 
 def load_file(filename):
@@ -32,12 +34,13 @@ def load_file(filename):
         result['amount'] = int(lines[0])
 
         photos = []
-        for line in lines[1:]:
+        for index, line in enumerate(lines[1:]):
             split = line.split(' ')
             photos.append({
                 'orientation': split[0],
-                'tag_amount' : int(split[1]),
-                'tags': split[2:]
+                'tag_amount': int(split[1]),
+                'tags': split[2:],
+                'index': index
             })
         result['photos'] = photos
 
