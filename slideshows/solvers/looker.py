@@ -29,12 +29,9 @@ def solve(problem):
             'tags': set(photo_a['tags'] + photo_b['tags'])
         })
 
-    tags = defaultdict(set)
 
-    for index, slide in enumerate(slides):
-        slide['index'] = index
-        for tag in slide['tags']:
-            tags[tag].add(index)
+    logger.info("Creating tags dictionary")
+    tags = create_tags(slides)
 
     available_slides = [slide['index'] for slide in slides]
     slideshow = []
@@ -66,6 +63,16 @@ def find_next_slide(slide, tags):
             logger.debug('matching on %s', tag)
             return next(iter(tags[tag]))
     return None
+
+
+def create_tags(slides):
+    tags = defaultdict(set)
+    for index, slide in enumerate(slides):
+        slide['index'] = index
+        for tag in slide['tags']:
+            tags[tag].add(index)
+    return tags
+
 
 def remove_from_tags(slide, tags):
     for tag in slide['tags']:
