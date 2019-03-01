@@ -1,5 +1,6 @@
 import logging
 from collections import defaultdict
+from tqdm import tqdm
 from solvers.general import value
 
 
@@ -36,25 +37,26 @@ def solve(problem):
             tags[tag].add(index)
 
     available_slides = [slide['index'] for slide in slides]
-
-    first_slide = slides.pop()
-    tags = remove_from_tags(first_slide, tags)
-    available_slides.remove(first_slide['index'])
-    slideshow = [first_slide]
-    logger.debug(first_slide)
+    slideshow = []
+    progress = tqdm(total=len(available_slides))
 
     while available_slides:
-        logger.info('slideshow length: %s', len(slideshow))
-        current_slide = slideshow[-1]
-        next_slide_index = find_next_slide(current_slide, tags)
+        try:
+            current_slide = slideshow[-1]
+            next_slide_index = find_next_slide(current_slide, tags, slides)
+        except IndexError:
+            next_slide_index = 0
+
         if next_slide_index is not None:
             available_slides.remove(next_slide_index)
             next_slide = slides[next_slide_index]
             logger.debug(next_slide)
             tags = remove_from_tags(next_slide, tags)
             slideshow.append(next_slide)
+            progress.update(1)
             continue
         break
+    progress.close()
 
     return [slide['photos'] for slide in slideshow]
 
