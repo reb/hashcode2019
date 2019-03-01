@@ -2,6 +2,7 @@ import logging
 from collections import defaultdict
 from tqdm import tqdm
 from solvers.general import value
+from solvers import iterative
 
 
 logger = logging.getLogger('solvers/looker.py')
@@ -29,7 +30,6 @@ def solve(problem):
             'tags': set(photo_a['tags'] + photo_b['tags'])
         })
 
-
     logger.info("Creating tags dictionary")
     tags = create_tags(slides)
 
@@ -55,6 +55,8 @@ def solve(problem):
         break
     progress.close()
 
+    logger.info("Optimizing slideshow")
+    iterative.optimize(slideshow)
     return [slide['photos'] for slide in slideshow]
 
 def find_next_slide(slide, tags):

@@ -27,6 +27,11 @@ def solve(problem):
             'tags': sorted(photo_a['tags'] + photo_b['tags'])
         })
 
+    optimize(slideshow)
+    return [slide['photos'] for slide in slideshow]
+
+
+def optimize(slideshow):
     changes = True
     while changes:
         changes = False
@@ -34,8 +39,6 @@ def solve(problem):
             if should_swap(slideshow, i):
                 slideshow[i-1], slideshow[i] = slideshow[i], slideshow[i-1]
                 changes = True
-
-    return [slide['photos'] for slide in slideshow]
 
 
 def should_swap(slideshow, i):
