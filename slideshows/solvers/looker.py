@@ -44,15 +44,16 @@ def solve(problem):
         except IndexError:
             next_slide_index = 0
 
-        if next_slide_index is not None:
-            available_slides.remove(next_slide_index)
-            next_slide = slides[next_slide_index]
-            logger.debug(next_slide)
-            tags = remove_from_tags(next_slide, tags)
-            slideshow.append(next_slide)
-            progress.update(1)
-            continue
-        break
+        if next_slide_index is None:
+            next_slide_index = available_slides[0]
+
+        available_slides.remove(next_slide_index)
+        next_slide = slides[next_slide_index]
+        logger.debug(next_slide)
+        tags = remove_from_tags(next_slide, tags)
+        slideshow.append(next_slide)
+        progress.update(1)
+
     progress.close()
 
     logger.info("Optimizing slideshow")
